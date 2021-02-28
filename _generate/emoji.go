@@ -11,9 +11,9 @@ import (
 
 type emojiData struct {
 	Group    string
+	Subgroup string
 	Name     string
-	GroupVar string
-	NameVar  string
+	Var      string
 	Keyword  string
 
 	Unicode string
@@ -48,14 +48,17 @@ func getEmojiList() ([]*emojiData, error) {
 	}
 
 	currGroup := ""
-	currGroupVar := ""
+	currSubgroup := ""
 	trs := doc.Find("tr")
 	out := make([]*emojiData, 0, trs.Length())
 	trs.Each(func(i int, sel *goquery.Selection) {
-		head := sel.Find("th.bighead")
-		if head.Length() != 0 {
+		if head := sel.Find("th.bighead"); head.Length() != 0 {
 			currGroup = head.Text()
-			currGroupVar = variable(currGroup)
+			currSubgroup = ""
+			return
+		}
+		if head := sel.Find("th.mediumhead"); head.Length() != 0 {
+			currSubgroup = head.Text()
 			return
 		}
 		if sel.Find("td.code").Length() == 0 {
@@ -69,9 +72,9 @@ func getEmojiList() ([]*emojiData, error) {
 
 		out = append(out, &emojiData{
 			Group:    currGroup,
+			Subgroup: currSubgroup,
 			Name:     name,
-			GroupVar: currGroupVar,
-			NameVar:  variable(name),
+			Var:      variable(name),
 			Keyword:  keyword,
 
 			Unicode: uni,
@@ -82,6 +85,15 @@ func getEmojiList() ([]*emojiData, error) {
 }
 
 func variable(s string) string {
+	first := rune(0)
+	for _, r := range s {
+		first = r
+		break
+	}
+	if unicode.IsDigit(first) {
+		s = "Number" + s
+	}
+
 	rep := []string{
 		"-", " ",
 		":", " ",

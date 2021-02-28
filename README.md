@@ -2,6 +2,16 @@
 
 + An emoji characters library for golang.
 
+### Generate
+
+```bash
+# Do generate for the first time.
+sh generate.sh
+
+# Do generate after emoji.go has been generated.
+go generate
+```
+
 ### Reference
 
 + [Unicode: Emoji List, v13.1](https://unicode.org/emoji/charts/emoji-list.html)

@@ -6,6 +6,7 @@
 
 ### Project ###
 build/
+*.out
 
 ### Genetated (temp) ###
 emoji.go
