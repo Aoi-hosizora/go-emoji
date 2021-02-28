@@ -1,3 +1,3 @@
-module github.com/Aoi-hosizora/go-emojis
+module github.com/Aoi-hosizora/go-emoji
 
-go 1.15
+go 1.16
