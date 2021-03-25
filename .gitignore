@@ -9,4 +9,4 @@ build/
 *.out
 
 ### Genetated (temp) ###
-emoji.go
+# emoji.go

@@ -1,6 +1,6 @@
 # go-emoji
 
-+ An emoji characters library for golang. This library includes all emojis from [Unicode: Emoji List, v13.1](https://unicode.org/emoji/charts/emoji-list.html).
++ An emoji characters library for golang. This library includes all emojis from [Emoji List, v13.1](https://unicode.org/emoji/charts/emoji-list.html) and [Full Emoji Modifier Sequences, v13.1](https://unicode.org/emoji/charts/full-emoji-modifiers.html).
 
 ### Usage
 
