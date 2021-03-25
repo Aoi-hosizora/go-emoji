@@ -11,23 +11,8 @@ import (
 	"unicode"
 )
 
-type emojiData struct {
-	Group    string
-	Subgroup string
-	Name     string
-	Var      string
-	Keyword  string
-
-	Unicode string
-	UTF8    string
-}
-
-const (
-	unicodeEmojiListUrl = "https://unicode.org/emoji/charts/emoji-list.html"
-)
-
-func getEmojiList() ([]*emojiData, error) {
-	req, err := http.NewRequest("GET", unicodeEmojiListUrl, nil)
+func httpGet(url string) (*goquery.Document, error) {
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -49,56 +34,36 @@ func getEmojiList() ([]*emojiData, error) {
 		return nil, err
 	}
 
-	currGroup := ""
-	currSubgroup := ""
-	trs := doc.Find("tr")
-	out := make([]*emojiData, 0, trs.Length())
-	trs.Each(func(i int, sel *goquery.Selection) {
-		if head := sel.Find("th.bighead"); head.Length() != 0 {
-			currGroup = head.Text()
-			currSubgroup = ""
-			return
-		}
-		if head := sel.Find("th.mediumhead"); head.Length() != 0 {
-			currSubgroup = head.Text()
-			return
-		}
-		if sel.Find("td.code").Length() == 0 {
-			return
-		}
+	return doc, err
+}
 
-		uni := sel.Find("td.code").Text()
-		name := sel.Find("td.name").First().Text()
-		keyword := sel.Find("td.name").Last().Text()
-		keyword = strings.ReplaceAll(keyword, " | ", ", ")
-
-		rawBs := make([]byte, 0)
-		for _, part := range strings.Split(uni, " ") {
-			partNum, err := strconv.ParseInt(strings.TrimLeft(part, "U+"), 16, 32)
-			if err != nil {
-				return
-			}
-			partStr := string(rune(partNum))
-			rawBs = append(rawBs, []byte(partStr)...)
+func unicodeTextToString(uni string) (string, error) {
+	rawBs := make([]byte, 0)
+	for _, part := range strings.Split(uni, " ") {
+		partNum, err := strconv.ParseInt(strings.TrimLeft(part, "U+"), 16, 32)
+		if err != nil {
+			return "", err
 		}
-		sb := strings.Builder{}
-		for _, num := range rawBs {
-			sb.WriteString(fmt.Sprintf("\\x%02x", num))
-		}
+		partStr := string(rune(partNum))
+		rawBs = append(rawBs, []byte(partStr)...)
+	}
 
-		out = append(out, &emojiData{
-			Group:    currGroup,
-			Subgroup: currSubgroup,
-			Name:     name,
-			Var:      variable(name),
-			Keyword:  keyword,
+	sb := strings.Builder{}
+	for _, num := range rawBs {
+		sb.WriteString(fmt.Sprintf("\\x%02x", num))
+	}
+	return sb.String(), nil
+}
 
-			Unicode: uni,
-			UTF8:    sb.String(),
-		})
-	})
+type emojiData struct {
+	Group    string
+	Subgroup string
+	Name     string
+	Var      string
+	Keyword  string
 
-	return out, nil
+	Unicode string
+	UTF8    string
 }
 
 func variable(s string) string {

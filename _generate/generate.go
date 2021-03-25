@@ -31,7 +31,7 @@ package {{ .Package }}
 
 const (
 	{{ range $idx, $val := .List }}
-	// {{ $val.Var }} represents "{{ $val.Name }}" ({{ $val.Unicode }}) in "{{ $val.Subgroup }}" from "{{ $val.Group }}".
+	// {{ $val.Var }} represents "{{ $val.Name }}" ({{ $val.Unicode }}) in "{{ $val.Subgroup }}" from "{{ $val.Group }}" group.
 	// Other keywords: {{ $val.Keyword }}.
 	{{ $val.Var }} = "{{ $val.UTF8 }}"
 	{{ end }}
@@ -46,10 +46,15 @@ func main() {
 	}
 
 	// http get
-	list, err := getEmojiList()
+	list1, err := getEmojiList()
 	if err != nil {
 		log.Fatalln("Failed to get emoji list:", err)
 	}
+	list2, err := getFullEmojiModifiers()
+	if err != nil {
+		log.Fatalln("Failed to get full emoji modifiers:", err)
+	}
+	list := append(list1, list2...)
 
 	// template
 	t, err := template.New("template").Parse(codeTemplate)
