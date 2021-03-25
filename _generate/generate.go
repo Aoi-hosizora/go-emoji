@@ -33,7 +33,7 @@ const (
 	{{ range $idx, $val := .List }}
 	// {{ $val.Var }} represents "{{ $val.Name }}" ({{ $val.Unicode }}) in "{{ $val.Subgroup }}" from "{{ $val.Group }}".
 	// Other keywords: {{ $val.Keyword }}.
-	{{ $val.Var }} = "{{ $val.Unicode }}"
+	{{ $val.Var }} = "{{ $val.UTF8 }}"
 	{{ end }}
 )
 `
@@ -56,7 +56,6 @@ func main() {
 	if err != nil {
 		log.Fatalln("Failed to parse template:", err)
 	}
-
 	buf := &bytes.Buffer{}
 	err = t.Execute(buf, &templateData{
 		Package: *fPackage,
@@ -66,14 +65,19 @@ func main() {
 		log.Fatalln("Failed to execute template:", err)
 	}
 
-	// fmt
+	// format
 	bs, err := format.Source(buf.Bytes())
 	if err != nil {
 		log.Fatalln("Failed to format generated code:", err)
 	}
 
 	// file
-	_ = os.Remove(*fFilename)
+	if _, err := os.Stat(*fFilename); os.IsExist(err) {
+		err = os.Remove(*fFilename)
+		if err != nil {
+			log.Fatalln("Failed to remove old code file:", err)
+		}
+	}
 	file, err := os.Create(*fFilename)
 	if err != nil {
 		log.Fatalln("Failed to create code file:", err)

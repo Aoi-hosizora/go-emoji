@@ -2,9 +2,11 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -17,7 +19,7 @@ type emojiData struct {
 	Keyword  string
 
 	Unicode string
-	UTF8    []byte
+	UTF8    string
 }
 
 const (
@@ -70,6 +72,20 @@ func getEmojiList() ([]*emojiData, error) {
 		keyword := sel.Find("td.name").Last().Text()
 		keyword = strings.ReplaceAll(keyword, " | ", ", ")
 
+		rawBs := make([]byte, 0)
+		for _, part := range strings.Split(uni, " ") {
+			partNum, err := strconv.ParseInt(strings.TrimLeft(part, "U+"), 16, 32)
+			if err != nil {
+				return
+			}
+			partStr := string(rune(partNum))
+			rawBs = append(rawBs, []byte(partStr)...)
+		}
+		sb := strings.Builder{}
+		for _, num := range rawBs {
+			sb.WriteString(fmt.Sprintf("\\x%02x", num))
+		}
+
 		out = append(out, &emojiData{
 			Group:    currGroup,
 			Subgroup: currSubgroup,
@@ -78,9 +94,10 @@ func getEmojiList() ([]*emojiData, error) {
 			Keyword:  keyword,
 
 			Unicode: uni,
-			UTF8:    []byte{},
+			UTF8:    sb.String(),
 		})
 	})
+
 	return out, nil
 }
 

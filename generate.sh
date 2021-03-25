@@ -1,7 +1,12 @@
+#!/bin/bash
+
 # build
 cd _generate || exit
 go build -o generate.out
+success=$?
 cd ..
 
 # generate
-./_generate/generate.out -pkg "emoji" -o "emoji.go"
+if [[ success -eq 0 ]]; then
+  ./_generate/generate.out -pkg "emoji" -o "emoji.go"
+fi
