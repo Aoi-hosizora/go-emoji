@@ -1,5 +1,9 @@
 # go-emoji
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/Aoi-hosizora/go-emoji)](https://goreportcard.com/report/github.com/Aoi-hosizora/go-emoji)
+[![License](http://img.shields.io/badge/license-mit-blue.svg)](./LICENSE)
+[![Release](https://img.shields.io/github/v/release/Aoi-hosizora/go-emoji)](https://github.com/Aoi-hosizora/go-emoji/releases)
+
 + An emoji characters library for golang. This library includes all emojis from [Emoji List, v13.1](https://unicode.org/emoji/charts/emoji-list.html) and [Full Emoji Modifier Sequences, v13.1](https://unicode.org/emoji/charts/full-emoji-modifiers.html).
 
 ### Usage
